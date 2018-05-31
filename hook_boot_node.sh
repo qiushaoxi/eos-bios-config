@@ -36,25 +36,22 @@ echo "$4" >> fullnode/config.ini
 
 
 # remove data
-rm -rf $eos_data_dir
-mkdir -p $eos_data_dir
+rm -rf $eos_data_dir/$stage_name
 
 # sftp put config file to fullnode
 sftp $fullnode1_username@$fullnode1_ip << EOF
-rm -rf $eos_config_dir
-mkdir -p $eos_config_dir
-put `pwd`/fullnode/* $eos_config_dir
-rm -rf $eos_data_dir
-mkdir -p $eos_data_dir
+rmdir $eos_config_dir
+mkdir $eos_config_dir/$stage_name
+put `pwd`/fullnode/* $eos_config_dir/$stage_name
+rmdir $eos_data_dir/$stage_name
 quit
 EOF
 
 sftp $fullnode2_username@$fullnode2_ip << EOF
-rm -rf $eos_config_dir
-mkdir -p $eos_config_dir
-put `pwd`/fullnode/* $eos_config_dir
-rm -rf $eos_data_dir
-mkdir -p $eos_data_dir
+rmdir $eos_config_dir
+mkdir $eos_config_dir/$stage_name
+put `pwd`/fullnode/* $eos_config_dir/$stage_name
+rmdir $eos_data_dir/$stage_name
 quit
 EOF
 
@@ -65,7 +62,7 @@ EOF
 
 echo "Running 'bootnode' through Docker."
 docker run -ti --detach --name bpnode-$stage_name \
-       -v `pwd`:/etc/nodeos -v $eos_data_dir:/data \
+       -v `pwd`:/etc/nodeos -v $eos_data_dir/$stage_name:/data \
        -p $bpnode_http_port:8888 -p $bpnode_p2p_port:9876 \
        $docker_tag \
        /opt/eosio/bin/nodeos --data-dir=/data \

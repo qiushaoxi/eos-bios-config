@@ -56,27 +56,25 @@ echo "p2p-peer-address = '$bpnode_ip:$bpnode_p2p_port'" >> fullnode/config.ini
 
 # sftp put config file to fullnode
 sftp $fullnode1_username@$fullnode1_ip << EOF
-rm -rf $eos_config_dir
-mkdir -p $eos_config_dir
-put `pwd`/fullnode/* $eos_config_dir
-rm -rf $eos_data_dir
-mkdir -p $eos_data_dir
+rmdir $eos_config_dir
+mkdir $eos_config_dir/$stage_name
+put `pwd`/fullnode/* $eos_config_dir/$stage_name
+rmdir $eos_data_dir
 quit
 EOF
 
 sftp $fullnode2_username@$fullnode2_ip << EOF
-rm -rf $eos_config_dir
-mkdir -p $eos_config_dir
-put `pwd`/fullnode/* $eos_config_dir
-rm -rf $eos_data_dir
-mkdir -p $eos_data_dir
+rmdir $eos_config_dir
+mkdir $eos_config_dir/$stage_name
+put `pwd`/fullnode/* $eos_config_dir/$stage_name
+rmdir $eos_data_dir
 quit
 EOF
 
 
 echo "Running 'fullnode1' through Docker."
 docker -H $fullnode1_ip:5555 run -ti --detach --name fullnode-$stage_name \
-       -v $eos_config_dir:/etc/nodeos -v $eos_data_dir:/data \
+       -v $eos_config_dir/$stage_name:/etc/nodeos -v $eos_data_dir/$stage_name:/data \
        -p $fullnode1_http_port:8888 -p $fullnode1_p2p_port:9876 \
        $docker_tag \
        /opt/eosio/bin/nodeos --data-dir=/data \
@@ -85,7 +83,7 @@ docker -H $fullnode1_ip:5555 run -ti --detach --name fullnode-$stage_name \
 echo ""
 echo "Running 'fullnode2' through Docker."
 docker -H $fullnode2_ip:5555 run -ti --detach --name fullnode-$stage_name \
-       -v $eos_config_dir:/etc/nodeos -v $eos_data_dir:/data \
+       -v $eos_config_dir/$stage_name:/etc/nodeos -v $eos_data_dir/$stage_name:/data \
        -p $fullnode2_http_port:8888 -p $fullnode2_p2p_port:9876 \
        $docker_tag \
        /opt/eosio/bin/nodeos --data-dir=/data \
@@ -95,7 +93,7 @@ echo ""
 
 echo "Running 'nodeos' through Docker."
 docker run -ti --detach --name bpnode-$stage_name \
-       -v `pwd`:/etc/nodeos -v $eos_data_dir:/data \
+       -v `pwd`:/etc/nodeos -v $eos_data_dir/$stage_name:/data \
        -p $bpnode_http_port:8888 -p $bpnode_p2p_port:9876 \
        $docker_tag \
        /opt/eosio/bin/nodeos --data-dir=/data \
