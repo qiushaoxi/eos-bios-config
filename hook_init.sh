@@ -5,6 +5,8 @@
 
 echo "Starting $1 operation"
 
+echo "Load env config"
+source set-env.sh
 
 docker kill bpnode-$stage_name || true
 docker rm bpnode-$stage_name || true

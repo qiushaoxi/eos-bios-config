@@ -11,6 +11,9 @@
 #
 # This process must not BLOCK.
 
+echo "Load env config"
+source set-env.sh
+
 echo "Copying base config"
 cp base_config.ini config.ini
 

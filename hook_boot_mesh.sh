@@ -1,5 +1,8 @@
 #!/bin/bash -e
 
+echo "Load env config"
+source set-env.sh
+
 echo "AS THE BIOS BOOT, YOU NOW NEED TO LINK TO THE NETWORK:"
 echo "Running 'fullnode1' through Docker."
 docker -H $fullnode1_ip:5555 run -ti --detach --name fullnode-$stage_name \
