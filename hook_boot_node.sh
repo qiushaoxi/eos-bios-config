@@ -40,7 +40,7 @@ rm -rf $eos_data_dir/$stage_name
 
 # sftp put config file to fullnode
 sftp $fullnode1_username@$fullnode1_ip << EOF
-rmdir $eos_config_dir
+rmdir $eos_config_dir/$stage_name
 mkdir $eos_config_dir/$stage_name
 put `pwd`/fullnode/* $eos_config_dir/$stage_name
 rmdir $eos_data_dir/$stage_name
@@ -48,7 +48,7 @@ quit
 EOF
 
 sftp $fullnode2_username@$fullnode2_ip << EOF
-rmdir $eos_config_dir
+rmdir $eos_config_dir、/$stage_name
 mkdir $eos_config_dir/$stage_name
 put `pwd`/fullnode/* $eos_config_dir/$stage_name
 rmdir $eos_data_dir/$stage_name
