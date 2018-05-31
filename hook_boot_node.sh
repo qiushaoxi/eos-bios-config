@@ -31,7 +31,7 @@ rm -rf fullnode
 mkdir fullnode
 cp base_config.ini fullnode/config.ini
 cp genesis.json fullnode/genesis.json
-echo "p2p-peer-address = '$bpnode_ip:$bpnode_p2p_port'" >> fullnode/config.ini
+echo "p2p-peer-address = $bpnode_ip:$bpnode_p2p_port" >> fullnode/config.ini
 echo "$4" >> fullnode/config.ini
 
 
@@ -48,7 +48,7 @@ quit
 EOF
 
 sftp $fullnode2_username@$fullnode2_ip << EOF
-rmdir $eos_config_dir、/$stage_name
+rmdir $eos_config_dir/$stage_name
 mkdir $eos_config_dir/$stage_name
 put `pwd`/fullnode/* $eos_config_dir/$stage_name
 rmdir $eos_data_dir/$stage_name
@@ -82,7 +82,7 @@ docker run -ti --detach --name bpnode-$stage_name \
 # All three options can be removed when you're ready to mesh with the network.
 
 echo ""
-echo "   View logs with: docker logs -f 'bpnode-$stage_name'"
+echo "   View logs with: docker logs -f bpnode-$stage_name"
 echo ""
 
 echo "Waiting 3 secs for nodeos to launch through Docker"

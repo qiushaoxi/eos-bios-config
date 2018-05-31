@@ -37,8 +37,8 @@ echo "Copying base config"
 cp base_config.ini config.ini
 echo "$2" >> config.ini
 echo "$4" >> config.ini
-echo "p2p-peer-address = '$fullnode1_ip:$fullnode1_p2p_port'" >> config.ini
-echo "p2p-peer-address = '$fullnode2_ip:$fullnode2_p2p_port'" >> config.ini
+echo "p2p-peer-address = $fullnode1_ip:$fullnode1_p2p_port" >> config.ini
+echo "p2p-peer-address = $fullnode2_ip:$fullnode2_p2p_port" >> config.ini
 echo "private-key = [\"$PUBKEY\",\"$PRIVKEY\"]" >> config.ini
 echo "plugin = eosio::producer_api_plugin" >> config.ini
 
@@ -50,7 +50,7 @@ cp bash_config.ini fullnode/config.ini
 cp genesis.json fullnode/genesis.json
 echo "$2" >> fullnode/config.ini
 echo "$4" >> fullnode/config.ini
-echo "p2p-peer-address = '$bpnode_ip:$bpnode_p2p_port'" >> fullnode/config.ini
+echo "p2p-peer-address = $bpnode_ip:$bpnode_p2p_port" >> fullnode/config.ini
 
 
 
