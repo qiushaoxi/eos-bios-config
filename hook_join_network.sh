@@ -46,7 +46,7 @@ echo "plugin = eosio::producer_api_plugin" >> config.ini
 # add none bp fullnode
 rm -rf fullnode
 mkdir fullnode
-cp bash_config.ini fullnode/config.ini
+cp base_config.ini fullnode/config.ini
 cp genesis.json fullnode/genesis.json
 echo "$2" >> fullnode/config.ini
 echo "$4" >> fullnode/config.ini
