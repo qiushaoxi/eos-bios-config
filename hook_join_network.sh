@@ -56,25 +56,21 @@ echo "p2p-peer-address = $bpnode_ip:$bpnode_p2p_port" >> fullnode/config.ini
 
 # sftp put config file to fullnode
 sftp $fullnode1_username@$fullnode1_ip << EOF
-rmdir $eos_config_dir/$stage_name
 mkdir $eos_config_dir/$stage_name
 put `pwd`/fullnode/* $eos_config_dir/$stage_name
-rmdir $eos_data_dir
 quit
 EOF
 
 sftp $fullnode2_username@$fullnode2_ip << EOF
-rmdir $eos_config_dir/$stage_name
 mkdir $eos_config_dir/$stage_name
 put `pwd`/fullnode/* $eos_config_dir/$stage_name
-rmdir $eos_data_dir
 quit
 EOF
 
 
 echo "Running 'fullnode1' through Docker."
 docker -H $fullnode1_ip:5555 run -ti --detach --name fullnode-$stage_name \
-       -v $eos_config_dir/$stage_name:/etc/nodeos -v $eos_data_dir/$stage_name:/data \
+       -v $eos_config_dir/$stage_name:/etc/nodeos -v $eos_data_dir/$stage_name/`date +%s`:/data \
        -p $fullnode1_http_port:8888 -p $fullnode1_p2p_port:9876 \
        $docker_tag \
        /opt/eosio/bin/nodeos --data-dir=/data \
@@ -83,7 +79,7 @@ docker -H $fullnode1_ip:5555 run -ti --detach --name fullnode-$stage_name \
 echo ""
 echo "Running 'fullnode2' through Docker."
 docker -H $fullnode2_ip:5555 run -ti --detach --name fullnode-$stage_name \
-       -v $eos_config_dir/$stage_name:/etc/nodeos -v $eos_data_dir/$stage_name:/data \
+       -v $eos_config_dir/$stage_name:/etc/nodeos -v $eos_data_dir/$stage_name/`date +%s`:/data \
        -p $fullnode2_http_port:8888 -p $fullnode2_p2p_port:9876 \
        $docker_tag \
        /opt/eosio/bin/nodeos --data-dir=/data \
