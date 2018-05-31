@@ -5,8 +5,12 @@
 
 echo "Starting $1 operation"
 
-docker kill nodeos-bios || true
-docker rm nodeos-bios || true
 
-docker -H 10.10.0.54:5555 kill fullnode || true
-docker -H 10.10.0.54 rm:5555 fullnode || true
+docker kill bpnode-$stage_name || true
+docker rm bpnode-$stage_name || true
+
+docker -H $fullnode1_ip:5555 kill fullnode-$stage_name || true
+docker -H $fullnode1_ip:5555 rm fullnode-$stage_name || true
+
+docker -H $fullnode2_ip:5555 kill fullnode-$stage_name || true
+docker -H $fullnode2_ip:5555 rm fullnode-$stage_name || true
