@@ -26,6 +26,7 @@ source set-env.sh
 
 echo "Removing old nodeos data (you might be asked for your sudo password)..."
 sudo rm -rf $eos_data_dir
+mkdir -p $eos_data_dir
 
 echo "Writing genesis.json"
 echo $1 > genesis.json
@@ -56,19 +57,19 @@ echo "p2p-peer-address = '$bpnode_ip:$bpnode_p2p_port'" >> fullnode/config.ini
 # sftp put config file to fullnode
 sftp $fullnode1_username@$fullnode1_ip << EOF
 rm -rf $eos_config_dir
-mkdir $eos_config_dir
+mkdir -p $eos_config_dir
 put `pwd`/fullnode/* $eos_config_dir
 rm -rf $eos_data_dir
-mkdir $eos_data_dir
+mkdir -p $eos_data_dir
 quit
 EOF
 
 sftp $fullnode2_username@$fullnode2_ip << EOF
 rm -rf $eos_config_dir
-mkdir $eos_config_dir
+mkdir -p $eos_config_dir
 put `pwd`/fullnode/* $eos_config_dir
 rm -rf $eos_data_dir
-mkdir $eos_data_dir
+mkdir -p $eos_data_dir
 quit
 EOF
 

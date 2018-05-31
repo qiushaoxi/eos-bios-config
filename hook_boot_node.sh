@@ -37,24 +37,24 @@ echo "$4" >> fullnode/config.ini
 
 # remove data
 rm -rf $eos_data_dir
-mkdir $eos_data_dir
+mkdir -p $eos_data_dir
 
 # sftp put config file to fullnode
 sftp $fullnode1_username@$fullnode1_ip << EOF
 rm -rf $eos_config_dir
-mkdir $eos_config_dir
+mkdir -p $eos_config_dir
 put `pwd`/fullnode/* $eos_config_dir
 rm -rf $eos_data_dir
-mkdir $eos_data_dir
+mkdir -p $eos_data_dir
 quit
 EOF
 
 sftp $fullnode2_username@$fullnode2_ip << EOF
 rm -rf $eos_config_dir
-mkdir $eos_config_dir
+mkdir -p $eos_config_dir
 put `pwd`/fullnode/* $eos_config_dir
 rm -rf $eos_data_dir
-mkdir $eos_data_dir
+mkdir -p $eos_data_dir
 quit
 EOF
 
