@@ -31,8 +31,44 @@ rm -rf fullnode
 mkdir fullnode
 cp base_config.ini fullnode/config.ini
 cp genesis.json fullnode/genesis.json
-echo "p2p-peer-address = $bpnode_ip:$bpnode_p2p_port" >> fullnode/config.ini
 echo "$4" >> fullnode/config.ini
+echo "p2p-peer-address = $bpnode_ip:$p2p_port" >> fullnode/config.ini
+echo "p2p-peer-address = $fullnode1_ip:$p2p_port" >> fullnode/config.ini
+echo "p2p-peer-address = $fullnode2_ip:$p2p_port" >> fullnode/config.ini
+echo "p2p-peer-address = $fullnode3_ip:$p2p_port" >> fullnode/config.ini
+# add restart and join scripte
+echo "docker run -ti --detach --name fullnode-$stage_name \
+       -v $eos_config_dir/$stage_name:/etc/nodeos -v $eos_data_dir/$stage_name/$date_dir_name:/data \
+       -p $http_port:8888 -p $p2p_port:9876 \
+       $docker_tag \
+       /opt/eosio/bin/nodeos --data-dir=/data \
+                             --config-dir=/etc/nodeos \
+                             --genesis-json=/etc/nodeos/genesis.json " > fullnode/join.sh
+
+echo "docker rm -f fullnode-$stage_name
+    docker run -ti --detach --name fullnode-$stage_name \
+       -v $eos_config_dir/$stage_name:/etc/nodeos -v $eos_data_dir/$stage_name/$date_dir_name:/data \
+       -p $http_port:8888 -p $p2p_port:9876 \
+       $docker_tag \
+       /opt/eosio/bin/nodeos --data-dir=/data \
+                             --config-dir=/etc/nodeos \
+                             --hard-replay-blockchain " > fullnode/restart.sh
+
+echo "docker run -ti --detach --name bpnode-$stage_name \
+       -v `pwd`:/etc/nodeos -v $eos_data_dir/$stage_name:/data \
+       -p $http_port:8888 -p $p2p_port:9876 \
+       $docker_tag \
+       /opt/eosio/bin/nodeos --data-dir=/data \
+                             --config-dir=/etc/nodeos \
+                             --genesis-json=/etc/nodeos/genesis.json" > join.sh
+
+echo "docker run -ti --detach --name bpnode-$stage_name \
+       -v `pwd`:/etc/nodeos -v $eos_data_dir/$stage_name:/data \
+       -p $http_port:8888 -p $p2p_port:9876 \
+       $docker_tag \
+       /opt/eosio/bin/nodeos --data-dir=/data \
+                             --config-dir=/etc/nodeos \
+                             --hard-replay-blockchain" > restart.sh
 
 
 # remove data
@@ -51,6 +87,11 @@ put `pwd`/fullnode/* $eos_config_dir/$stage_name
 quit
 EOF
 
+sftp $fullnode3_username@$fullnode3_ip << EOF
+mkdir $eos_config_dir/$stage_name
+put `pwd`/fullnode/* $eos_config_dir/$stage_name
+quit
+EOF
 
 
 #echo "Removing old nodeos data (you might be asked for your sudo password)..."
@@ -59,7 +100,7 @@ EOF
 echo "Running 'bootnode' through Docker."
 docker run -ti --detach --name bpnode-$stage_name \
        -v `pwd`:/etc/nodeos -v $eos_data_dir/$stage_name:/data \
-       -p $bpnode_http_port:8888 -p $bpnode_p2p_port:9876 \
+       -p $http_port:8888 -p $p2p_port:9876 \
        $docker_tag \
        /opt/eosio/bin/nodeos --data-dir=/data \
                              --config-dir=/etc/nodeos \

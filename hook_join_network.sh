@@ -23,6 +23,8 @@ PRIVKEY=5KQwrPbwdL6PhXujxW37FSSQZ1JiwsST4cqQzDeyXtP79zkvFD3
 echo "Load env config"
 source set-env.sh
 
+date_dir_name=`date +%s`
+
 
 echo "Removing old nodeos data (you might be asked for your sudo password)..."
 sudo rm -rf $eos_data_dir
@@ -37,8 +39,9 @@ echo "Copying base config"
 cp base_config.ini config.ini
 echo "$2" >> config.ini
 echo "$4" >> config.ini
-echo "p2p-peer-address = $fullnode1_ip:$fullnode1_p2p_port" >> config.ini
-echo "p2p-peer-address = $fullnode2_ip:$fullnode2_p2p_port" >> config.ini
+echo "p2p-peer-address = $fullnode1_ip:$p2p_port" >> config.ini
+echo "p2p-peer-address = $fullnode2_ip:$p2p_port" >> config.ini
+echo "p2p-peer-address = $fullnode3_ip:$p2p_port" >> config.ini
 echo "private-key = [\"$PUBKEY\",\"$PRIVKEY\"]" >> config.ini
 echo "plugin = eosio::producer_api_plugin" >> config.ini
 
@@ -49,8 +52,43 @@ mkdir fullnode
 cp base_config.ini fullnode/config.ini
 cp genesis.json fullnode/genesis.json
 echo "$2" >> fullnode/config.ini
-echo "$4" >> fullnode/config.ini
-echo "p2p-peer-address = $bpnode_ip:$bpnode_p2p_port" >> fullnode/config.ini
+echo "p2p-peer-address = $bpnode_ip:$p2p_port" >> fullnode/config.ini
+echo "p2p-peer-address = $fullnode1_ip:$p2p_port" >> fullnode/config.ini
+echo "p2p-peer-address = $fullnode2_ip:$p2p_port" >> fullnode/config.ini
+echo "p2p-peer-address = $fullnode3_ip:$p2p_port" >> fullnode/config.ini
+# add restart and join scripte
+echo "docker run -ti --detach --name fullnode-$stage_name \
+       -v $eos_config_dir/$stage_name:/etc/nodeos -v $eos_data_dir/$stage_name/$date_dir_name:/data \
+       -p $http_port:8888 -p $p2p_port:9876 \
+       $docker_tag \
+       /opt/eosio/bin/nodeos --data-dir=/data \
+                             --config-dir=/etc/nodeos \
+                             --genesis-json=/etc/nodeos/genesis.json " > fullnode/join.sh
+
+echo "docker rm -f fullnode-$stage_name
+    docker run -ti --detach --name fullnode-$stage_name \
+       -v $eos_config_dir/$stage_name:/etc/nodeos -v $eos_data_dir/$stage_name/$date_dir_name:/data \
+       -p $http_port:8888 -p $p2p_port:9876 \
+       $docker_tag \
+       /opt/eosio/bin/nodeos --data-dir=/data \
+                             --config-dir=/etc/nodeos \
+                             --hard-replay-blockchain " > fullnode/restart.sh
+
+echo "docker run -ti --detach --name bpnode-$stage_name \
+       -v `pwd`:/etc/nodeos -v $eos_data_dir/$stage_name:/data \
+       -p $http_port:8888 -p $p2p_port:9876 \
+       $docker_tag \
+       /opt/eosio/bin/nodeos --data-dir=/data \
+                             --config-dir=/etc/nodeos \
+                             --genesis-json=/etc/nodeos/genesis.json" > join.sh
+
+echo "docker run -ti --detach --name bpnode-$stage_name \
+       -v `pwd`:/etc/nodeos -v $eos_data_dir/$stage_name:/data \
+       -p $http_port:8888 -p $p2p_port:9876 \
+       $docker_tag \
+       /opt/eosio/bin/nodeos --data-dir=/data \
+                             --config-dir=/etc/nodeos \
+                             --hard-replay-blockchain" > restart.sh
 
 
 
@@ -67,11 +105,17 @@ put `pwd`/fullnode/* $eos_config_dir/$stage_name
 quit
 EOF
 
+sftp $fullnode3_username@$fullnode3_ip << EOF
+mkdir $eos_config_dir/$stage_name
+put `pwd`/fullnode/* $eos_config_dir/$stage_name
+quit
+EOF
+
 
 echo "Running 'fullnode1' through Docker."
 docker -H $fullnode1_ip:5555 run -ti --detach --name fullnode-$stage_name \
-       -v $eos_config_dir/$stage_name:/etc/nodeos -v $eos_data_dir/$stage_name/`date +%s`:/data \
-       -p $fullnode1_http_port:8888 -p $fullnode1_p2p_port:9876 \
+       -v $eos_config_dir/$stage_name:/etc/nodeos -v $eos_data_dir/$stage_name/$date_dir_name:/data \
+       -p $http_port:8888 -p $p2p_port:9876 \
        $docker_tag \
        /opt/eosio/bin/nodeos --data-dir=/data \
                              --config-dir=/etc/nodeos \
@@ -79,8 +123,17 @@ docker -H $fullnode1_ip:5555 run -ti --detach --name fullnode-$stage_name \
 echo ""
 echo "Running 'fullnode2' through Docker."
 docker -H $fullnode2_ip:5555 run -ti --detach --name fullnode-$stage_name \
-       -v $eos_config_dir/$stage_name:/etc/nodeos -v $eos_data_dir/$stage_name/`date +%s`:/data \
-       -p $fullnode2_http_port:8888 -p $fullnode2_p2p_port:9876 \
+       -v $eos_config_dir/$stage_name:/etc/nodeos -v $eos_data_dir/$stage_name/$date_dir_name:/data \
+       -p $http_port:8888 -p $p2p_port:9876 \
+       $docker_tag \
+       /opt/eosio/bin/nodeos --data-dir=/data \
+                             --config-dir=/etc/nodeos \
+                             --genesis-json=/etc/nodeos/genesis.json 
+echo ""
+echo "Running 'fullnode3' through Docker."
+docker -H $fullnode3_ip:5555 run -ti --detach --name fullnode-$stage_name \
+       -v $eos_config_dir/$stage_name:/etc/nodeos -v $eos_data_dir/$stage_name/$date_dir_name:/data \
+       -p $http_port:8888 -p $fp2p_port:9876 \
        $docker_tag \
        /opt/eosio/bin/nodeos --data-dir=/data \
                              --config-dir=/etc/nodeos \
@@ -90,7 +143,7 @@ echo ""
 echo "Running 'nodeos' through Docker."
 docker run -ti --detach --name bpnode-$stage_name \
        -v `pwd`:/etc/nodeos -v $eos_data_dir/$stage_name:/data \
-       -p $bpnode_http_port:8888 -p $bpnode_p2p_port:9876 \
+       -p $http_port:8888 -p $p2p_port:9876 \
        $docker_tag \
        /opt/eosio/bin/nodeos --data-dir=/data \
                              --config-dir=/etc/nodeos \

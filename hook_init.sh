@@ -16,3 +16,6 @@ docker -H $fullnode1_ip:5555 rm fullnode-$stage_name || true
 
 docker -H $fullnode2_ip:5555 kill fullnode-$stage_name || true
 docker -H $fullnode2_ip:5555 rm fullnode-$stage_name || true
+
+docker -H $fullnode3_ip:5555 kill fullnode-$stage_name || true
+docker -H $fullnode3_ip:5555 rm fullnode-$stage_name || true
