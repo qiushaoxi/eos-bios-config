@@ -37,7 +37,8 @@ echo "p2p-peer-address = $fullnode1_ip:$p2p_port" >> fullnode/config.ini
 echo "p2p-peer-address = $fullnode2_ip:$p2p_port" >> fullnode/config.ini
 echo "p2p-peer-address = $fullnode3_ip:$p2p_port" >> fullnode/config.ini
 # add restart and join scripte
-echo "docker run -ti --detach --name fullnode-$stage_name \
+echo "docker rm -f fullnode-$stage_name
+    docker run -ti --detach --name fullnode-$stage_name \
        -v $eos_config_dir/$stage_name:/etc/nodeos -v $eos_data_dir/$stage_name:/data \
        -p $http_port:8888 -p $p2p_port:9876 \
        $docker_tag \
