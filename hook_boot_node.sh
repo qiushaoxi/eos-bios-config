@@ -38,16 +38,17 @@ echo "p2p-peer-address = $fullnode2_ip:$p2p_port" >> fullnode/config.ini
 echo "p2p-peer-address = $fullnode3_ip:$p2p_port" >> fullnode/config.ini
 # add restart and join scripte
 echo "docker run -ti --detach --name fullnode-$stage_name \
-       -v $eos_config_dir/$stage_name:/etc/nodeos -v $eos_data_dir/$stage_name/$date_dir_name:/data \
+       -v $eos_config_dir/$stage_name:/etc/nodeos -v $eos_data_dir/$stage_name:/data \
        -p $http_port:8888 -p $p2p_port:9876 \
        $docker_tag \
        /opt/eosio/bin/nodeos --data-dir=/data \
                              --config-dir=/etc/nodeos \
+                             --delete-all-blocks \
                              --genesis-json=/etc/nodeos/genesis.json " > fullnode/join.sh
 
 echo "docker rm -f fullnode-$stage_name
     docker run -ti --detach --name fullnode-$stage_name \
-       -v $eos_config_dir/$stage_name:/etc/nodeos -v $eos_data_dir/$stage_name/$date_dir_name:/data \
+       -v $eos_config_dir/$stage_name:/etc/nodeos -v $eos_data_dir/$stage_name:/data \
        -p $http_port:8888 -p $p2p_port:9876 \
        $docker_tag \
        /opt/eosio/bin/nodeos --data-dir=/data \
