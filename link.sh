@@ -31,6 +31,8 @@ echo "p2p-peer-address = $bpnode_ip:$p2p_port" >> fullnode/config.ini
 echo "p2p-peer-address = $fullnode1_ip:$p2p_port" >> fullnode/config.ini
 echo "p2p-peer-address = $fullnode2_ip:$p2p_port" >> fullnode/config.ini
 echo "p2p-peer-address = $fullnode3_ip:$p2p_port" >> fullnode/config.ini
+cat p2p-peer-address >> fullnode/config.ini
+
 # add restart and join scripte
 echo "docker rm -f fullnode-$stage_name
     docker run -ti --detach --name fullnode-$stage_name \
