@@ -11,3 +11,7 @@ publish fullnode to internet.
 4. vim hook_join_network.sh
 5. vim my_discovery_file.yaml
 6. eos-bios *
+
+
+## docker
+docker build -t qiushaoxi/eosio:v1.0.0 --build-arg branch=v1.0.0  --build-arg symbol=EOS .
